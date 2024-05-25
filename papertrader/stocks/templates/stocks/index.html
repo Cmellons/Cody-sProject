@@ -10,9 +10,52 @@
     <link rel="stylesheet" href="{% static 'stylesheet.css' %}" type="text/css" />
     <style type="text/css">.body { width: auto; }</style>
   </head>
+  <script>
+    window.onload = function () {
+      var chart = new CanvasJS.Chart("chartContainer", {
+        theme: "light1",
+        exportEnabled: true,
+        zoomEnabled: true,
+        title: {
+          text: "{{stockname}} {{time_frame}} Stock Price"
+        },
+        axisY: {
+          prefix: "$"
+        },
+        data: [{
+          type: "candlestick",
+          risingColor:"green",
+          color:"black",
+          yValueFormatString: "$#,##0.00",
+          xValueFormatString: "MMM DD, YYYY",
+          xValueType: "dateTime",
+          dataPoints: {{ data|safe }}
+        }]
+      });
+      chart.render();
+    }
+  </script>
   <body>
-<h1> Hello {{name}} !!! </h1>
+<h1> Hello  PaperTrader  !!! </h1>
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name = "stockname" placeholder = "Enter Stock Name">
+    <button type="submit">submit</button>
+</form>
 <h5> Stock Name {{stockname}}</h5>
-<div>{{data}}</div>
+
+<form method = 'POST'>
+  {% csrf_token %}
+  <button type="submit" name="1min" >1min</button>
+  <button type="submit" name="5min" >5min</button>
+  <button type="submit" name="15min" >15min</button>
+  <button type="submit" name="30min" >30min</button>
+  <button type="submit" name="60min" >60min</button>
+  <button type="submit" name="1D" >Daily</button>
+  <button type="submit" name="1W" >Weekly</button>
+  <button type="submit" name="1M" >Monthly</button>
+</form>
+<div id="chartContainer" style="height: 360px; width: 100%"></div>
+  <script src="{% static 'canvasjs.min.js' %}"></script>
   </body>
 </html>
