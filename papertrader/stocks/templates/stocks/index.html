@@ -57,5 +57,10 @@
 </form>
 <div id="chartContainer" style="height: 360px; width: 100%"></div>
   <script src="{% static 'canvasjs.min.js' %}"></script>
+
+  <!-- Links to add stock and add user stock forms -->
+  <a href="{% url 'add_stock' %}">Add Stock</a>
+  <a href="{% url 'add_user_stock' %}">Add User Stock</a>
+  <a href="{% url 'buy_stock' %}">Buy Stock</a>
   </body>
 </html>

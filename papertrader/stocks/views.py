@@ -1,5 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import requests
+from .forms import StockForm, UserStockForm
+from .models import Stock, UserStock
+
 # Create your views here.
 # 15min, 30min, 60min will not work with Demo key
 def index(request):
@@ -75,3 +78,65 @@ def index(request):
                                                  'stockname': stock_name,
                                                  'time_frame':time_frame,
                                                  'data':dataset[-30:]})
+
+def add_stock(request):
+    if request.method == 'POST':
+        form = StockForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/success')  # Redirect to a success page or another view
+    else:
+        form = StockForm()
+    return render(request, 'stocks/add_stock.html', {'form': form})
+
+def add_user_stock(request):
+    if request.method == 'POST':
+        form = UserStockForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('success')  # Redirect to a success page or another view
+    else:
+        form = UserStockForm()
+    return render(request, 'stocks/add_user_stock.html', {'form': form})
+
+def success(request):
+    return render(request, 'stocks/success.html')
+
+def buy_stock(request):
+    if request.method == 'POST':
+        symbol = request.POST.get('symbol')
+        quantity = request.POST.get('quantity')
+        
+        # Debugging statement
+        print("Selected symbol:", symbol)
+        
+        try:
+            # Get the stock object from the symbol
+            stock = Stock.objects.get(symbol=symbol)
+        except Stock.DoesNotExist:
+            # Handle case where the stock does not exist
+            print("Stock with symbol", symbol, "does not exist")
+            return render(request, 'stocks/stock_not_found.html')
+        
+        # Calculate the total purchase price
+        purchase_price = stock.market_price * int(quantity)
+        
+        # Deduct the purchase amount from the user's account balance
+        user_portfolio = request.user.portfolio
+        if user_portfolio.cash_balance < purchase_price:
+            return render(request, 'insufficient_funds.html')
+        user_portfolio.cash_balance -= purchase_price
+        user_portfolio.save()
+        
+        # Update user's stock holdings
+        user_stock, created = UserStock.objects.get_or_create(user=request.user, stock=stock)
+        user_stock.quantity += int(quantity)
+        user_stock.save()
+        
+        # Redirect to a success page or another view
+        return redirect('success')  # Assuming 'success' is the name of your success URL pattern
+    else:
+        # Fetch stock options from the database
+        stocks = Stock.objects.all()
+        context = {'stocks': stocks}
+        return render(request, 'stocks/buy_stock.html', context)
