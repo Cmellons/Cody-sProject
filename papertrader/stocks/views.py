@@ -41,21 +41,21 @@ def index(request):
             URL = 'https://www.alphavantage.co/query'
             PARAMS = {'function':'TIME_SERIES_DAILY',
              'symbol':stock_name,
-            'apikey': 'demo' #use your key instead of demo but only
+            'apikey': 'demo' #use your key instead of demo 
                }
             time_frame_string = 'Time Series (Daily)'
         elif time_frame in ('1W'):
             URL = 'https://www.alphavantage.co/query'
             PARAMS = {'function':'TIME_SERIES_WEEKLY',
              'symbol':stock_name,
-            'apikey': 'demo' #use your key instead of demo but only
+            'apikey': 'demo' #use your key instead of demo 
                }
             time_frame_string = 'Weekly Time Series'
         elif time_frame in ('1M'):
             URL = 'https://www.alphavantage.co/query'
             PARAMS = {'function':'TIME_SERIES_MONTHLY',
              'symbol':stock_name,
-            'apikey': 'demo' #use your key instead of demo but only
+            'apikey': 'demo' #use your key instead of demo 
                }
             time_frame_string = 'Monthly Time Series'
         req = requests.get(url=URL, params= PARAMS)
